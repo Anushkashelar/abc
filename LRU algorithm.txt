@@ -1,0 +1,51 @@
+import java.util.*;
+
+public class LRUPageReplacement {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of frames: ");
+        int numFrames = scanner.nextInt();
+        List<Integer> frameList = new ArrayList<>(numFrames);
+
+        int pageFaults = 0;
+
+        System.out.print("Enter the page reference sequence (e.g., 1 2 3 4 1 2): ");
+        String[] pageReferences = scanner.nextLine().split(" ");
+
+        for (String pageRef : pageReferences) {
+            int page = Integer.parseInt(pageRef);
+
+            if (!frameList.contains(page)) {
+                if (frameList.size() == numFrames) {
+                    int index = findLRU(frameList, pageReferences, page);
+                    frameList.set(index, page);
+                } else {
+                    frameList.add(page);
+                }
+
+                pageFaults++;
+            }
+        }
+
+        System.out.println("Total Page Faults: " + pageFaults);
+        scanner.close();
+    }
+
+    private static int findLRU(List<Integer> frameList, String[] pageReferences, int currentPage) {
+        int lruIndex = frameList.size() - 1;
+
+        for (int i = frameList.size() - 2; i >= 0; i--) {
+            int page = frameList.get(i);
+
+            for (int j = pageReferences.length - 1; j >= 0; j--) {
+                if (page == Integer.parseInt(pageReferences[j])) {
+                    lruIndex = i;
+                    break;
+                }
+            }
+        }
+
+        return lruIndex;
+    }
+}
