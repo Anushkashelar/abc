@@ -1,0 +1,77 @@
+import java.util.Scanner;
+import java.util.Arrays;
+
+class Process {
+    String name;
+    int priority;
+    int burstTime;
+    int waitingTime;
+    int turnaroundTime;
+
+    public Process(String name, int priority, int burstTime) {
+        this.name = name;
+        this.priority = priority;
+        this.burstTime = burstTime;
+    }
+}
+
+public class Priority_Scheduler
+{
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of processes: ");
+        int numProcesses = scanner.nextInt();
+
+        Process[] processes = new Process[numProcesses];
+
+        for (int i = 0; i < numProcesses; i++) {
+            System.out.println("Enter details for Process " + (i + 1));
+            System.out.print("Name: ");
+            String name = scanner.next();
+            System.out.print("Priority: ");
+            int priority = scanner.nextInt();
+            System.out.print("Burst Time: ");
+            int burstTime = scanner.nextInt();
+            processes[i] = new Process(name, priority, burstTime);
+        }
+
+        runPriority(processes);
+
+        scanner.close();
+    }
+
+    public static void runPriority(Process[] processes) {
+        Arrays.sort(processes, (a, b) -> a.priority - b.priority);
+
+        int currentTime = 0;
+        double avgWaitingTime = 0;
+        double avgTurnaroundTime = 0;
+
+        for (Process process : processes) {
+            process.waitingTime = currentTime;
+            process.turnaroundTime = process.waitingTime + process.burstTime;
+
+            currentTime += process.burstTime;
+
+            System.out.println("Process " + process.name + ":");
+            System.out.println("Priority: " + process.priority);
+            System.out.println("Burst Time: " + process.burstTime);
+            System.out.println("Waiting Time: " + process.waitingTime);
+            System.out.println("Turnaround Time: " + process.turnaroundTime);
+            System.out.println();
+
+            avgWaitingTime += process.waitingTime;
+            avgTurnaroundTime += process.turnaroundTime;
+        }
+
+        avgWaitingTime /= processes.length;
+        avgTurnaroundTime /= processes.length;
+
+        System.out.println("Average Waiting Time: " + avgWaitingTime);
+        System.out.println("Average Turnaround Time: " + avgTurnaroundTime);
+    }
+}
+ 
+    
+ 

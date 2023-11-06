@@ -1,0 +1,79 @@
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+
+class Process {
+    String name;
+    int arrivalTime;
+    int burstTime;
+    int remainingTime;
+
+    public Process(String name, int arrivalTime, int burstTime) {
+        this.name = name;
+        this.arrivalTime = arrivalTime;
+        this.burstTime = burstTime;
+        this.remainingTime = burstTime;
+    }
+}
+
+public class RoundRobin_Scheduler {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of processes: ");
+        int numProcesses = scanner.nextInt();
+
+        System.out.print("Enter the time quantum: ");
+        int timeQuantum = scanner.nextInt();
+
+        Process[] processes = new Process[numProcesses];
+
+        for (int i = 0; i < numProcesses; i++) {
+            System.out.println("Enter details for Process " + (i + 1));
+            System.out.print("Name: ");
+            String name = scanner.next();
+            System.out.print("Arrival Time: ");
+            int arrivalTime = scanner.nextInt();
+            System.out.print("Burst Time: ");
+            int burstTime = scanner.nextInt();
+            processes[i] = new Process(name, arrivalTime, burstTime);
+        }
+
+        runRoundRobin(processes, timeQuantum);
+        scanner.close();
+    }
+
+    public static void runRoundRobin(Process[] processes, int timeQuantum) {
+        Queue<Process> readyQueue = new LinkedList<>();
+        int currentTime = 0;
+
+        while (!readyQueue.isEmpty() || Arrays.stream(processes).anyMatch(p -> p.remainingTime > 0)) {
+            for (Process process : processes) {
+                if (process.remainingTime > 0 && process.arrivalTime <= currentTime) {
+                    int executionTime = Math.min(process.remainingTime, timeQuantum);
+                    process.remainingTime -= executionTime;
+                    currentTime += executionTime;
+
+                    System.out.println("Process " + process.name + " executed for " + executionTime + " time units.");
+
+                    if (process.remainingTime == 0) {
+                        int turnaroundTime = currentTime - process.arrivalTime;
+                        int waitingTime = turnaroundTime - process.burstTime;
+
+                        System.out.println("Process " + process.name + " completed.");
+                        System.out.println("Turnaround Time: " + turnaroundTime);
+                        System.out.println("Waiting Time: " + waitingTime);
+                    }
+
+                    readyQueue.offer(process);
+                }
+            }
+
+            if (!readyQueue.isEmpty()) {
+                Process currentProcess = readyQueue.poll();
+                readyQueue.offer(currentProcess);
+            }
+        }
+    }
+}
